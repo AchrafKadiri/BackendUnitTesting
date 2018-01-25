@@ -28,6 +28,9 @@ namespace LearningTesting.Test
             vehicleService = container.Resolve<IVehicleService>();
         }
 
+        /// <summary>
+        /// Testing method which creates objects in repository and delete all this objects with the service.
+        /// </summary>
         [TestMethod]
         public async Task VehicleService_DeleteAllTest()
         {
@@ -62,6 +65,9 @@ namespace LearningTesting.Test
             Assert.AreEqual(result, vehiclesList.Count);
         }
 
+        /// <summary>
+        /// Testing method which creates objects with the service.
+        /// </summary>
         [TestMethod]
         public async Task VehicleService_AddVehicleTest()
         {
@@ -79,6 +85,9 @@ namespace LearningTesting.Test
             await vehicleService.DeleteVehicle(result.Id);
         }
 
+        /// <summary>
+        /// Testing method which creates an object with the repository and deletes it with the service.
+        /// </summary>
         [TestMethod]
         public async Task VehicleService_DeleteVehicleTest()
         {
@@ -96,7 +105,9 @@ namespace LearningTesting.Test
             Assert.IsTrue(resultDelete);
         }
 
-
+        /// <summary>
+        /// Testing method which creates an object with the repository and gets it with the service.
+        /// </summary>
         [TestMethod]
         public async Task VehicleService_GetVehicleTest()
         {
@@ -115,6 +126,9 @@ namespace LearningTesting.Test
             await vehicleService.DeleteVehicle(result.Id);
         }
 
+        /// <summary>
+        /// Testing method which creates an object with the repository and updates it with the service.
+        /// </summary>
         [TestMethod]
         public async Task VehicleService_UpdateVehicleTest()
         {
@@ -139,6 +153,9 @@ namespace LearningTesting.Test
             await vehicleService.DeleteVehicle(resultUpdate.Id);
         }
 
+        /// <summary>
+        /// Testing method which creates a list of objects with the repository and get it with the service.
+        /// </summary>
         [TestMethod]
         public async Task VehicleService_GetVehiclesTest()
         {
