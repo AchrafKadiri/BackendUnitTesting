@@ -4,57 +4,47 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace LearningTesting.Services
 {
     public class VehicleService : IVehicleService
     {
-        IEnumerable<Vehicle> listVehicles = new List<Vehicle>
-        {
-            new Vehicle()
-            {
-                VechicleRegistration=Guid.NewGuid(),
-                Brand="BMW",
-                Model="320D",
-                Colour="Black"
-            },
-            new Vehicle()
-            {
-                VechicleRegistration=Guid.NewGuid(),
-                Brand="AUDI",
-                Model="A3",
-                Colour="White"
-            },
-            new Vehicle()
-            {
-                VechicleRegistration=Guid.NewGuid(),
-                Brand="MERCEDES BENZ",
-                Model="CLA",
-                Colour="Black"
-            },
-            new Vehicle()
-            {
-                VechicleRegistration=Guid.NewGuid(),
-                Brand="VOLKSWAGEN",
-                Model="GOLF GTI",
-                Colour="White"
-            },
-        };
+        private IDatabaseRepo dbRepo;
 
-        public Vehicle AddVehicle(Vehicle v)
+        public VehicleService(IDatabaseRepo dbRepo)
         {
-            listVehicles.ToList().Add(v);
-            return v;
-        }
-          
-        public Vehicle GetVehicle(Guid id)
-        {
-            return listVehicles.Where(v => v.Id.Equals(id)).FirstOrDefault();
+            this.dbRepo = dbRepo;
         }
 
-        public IEnumerable<Vehicle> GetVehicleByColour(string colour)
+        async Task<Vehicle> IVehicleService.AddVehicle(Vehicle v)
         {
-            return listVehicles.Where(v => v.Colour.Equals(colour));
+            return await dbRepo.Create<Vehicle>(v);
+        }
+
+        async Task<bool> IVehicleService.DeleteVehicle(Guid id)
+        {
+            return await dbRepo.Delete<Vehicle>(id);
+        }
+
+        async Task<Vehicle> IVehicleService.GetVehicle(Guid id)
+        {
+            return await dbRepo.Get<Vehicle>(id);
+        }
+
+        async Task<IEnumerable<Vehicle>> IVehicleService.GetVehicles()
+        {
+            return await dbRepo.Get<Vehicle>();
+        }
+
+        async Task<Vehicle> IVehicleService.UpdateVehicle(Guid Id, Vehicle v)
+        {
+            return await dbRepo.Update<Vehicle>(Id, v);
+        }
+       
+        async Task<int> IVehicleService.DeleteAll()
+        {
+            return await dbRepo.DeleteAll<Vehicle>();
         }
     }
 }

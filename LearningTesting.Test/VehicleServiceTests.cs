@@ -2,7 +2,8 @@ using LearningTesting.DataModel;
 using LearningTesting.IServices;
 using LearningTesting.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity;
 
@@ -14,11 +15,12 @@ namespace LearningTesting.Test
         private IUnityContainer container;
         private IVehicleService vehicleService;
 
+
         [TestInitialize]
         public async Task Setup()
         {
             container = new UnityContainer();
-            
+
             await Helpers.LearningTestingHelper.RegisterLearningTestingHelper(container);
 
             container.RegisterType<IVehicleService, VehicleService>();
@@ -27,50 +29,151 @@ namespace LearningTesting.Test
         }
 
         [TestMethod]
-        public async Task VehicleService_AddVehicleTestAsync()
+        public async Task VehicleService_DeleteAllTest()
         {
             IDatabaseRepo dbRepo = container.Resolve<IDatabaseRepo>();
-
-            var vehicle = new Vehicle()
+            List<Vehicle> vehiclesList = new List<Vehicle>()
             {
-                VechicleRegistration = Guid.NewGuid(),
-                Brand = "FORD",
-                Model = "FOCUS",
-                Colour = "Black"
+                new Vehicle()
+                {
+                  Brand = "BMW",
+                  Model = "320D",
+                  Colour = "Black"
+                },
+                new Vehicle()
+                {
+                  Brand = "BMW",
+                  Model = "320D",
+                  Colour = "White"
+                },
+                new Vehicle()
+                {
+                  Brand = "AUDI",
+                  Model = "A5",
+                  Colour = "Black"
+                }
             };
 
-            var resultMem = await dbRepo.Create<Vehicle>(vehicle);
-            var resultSer = vehicleService.AddVehicle(vehicle);
+            var result1 = await dbRepo.Create<Vehicle>(vehiclesList[0]);
+            var result2 = await dbRepo.Create<Vehicle>(vehiclesList[1]);
+            var result3 = await dbRepo.Create<Vehicle>(vehiclesList[2]);
+            var result = await vehicleService.DeleteAll();
 
-            Assert.AreEqual(resultMem.VechicleRegistration, resultSer.VechicleRegistration);
+            Assert.AreEqual(result, vehiclesList.Count);
         }
 
         [TestMethod]
-        public async Task VehicleService_GetVehicleTestAsync()
+        public async Task VehicleService_AddVehicleTest()
+        {
+            var vehicle = new Vehicle()
+            {
+                Brand = "BMW",
+                Model = "320D",
+                Colour = "Black"
+            };
+
+            var result = await vehicleService.AddVehicle(vehicle);
+
+            Assert.AreNotEqual(vehicle.Id, result.Id);
+
+            await vehicleService.DeleteVehicle(result.Id);
+        }
+
+        [TestMethod]
+        public async Task VehicleService_DeleteVehicleTest()
         {
             IDatabaseRepo dbRepo = container.Resolve<IDatabaseRepo>();
             var vehicle = new Vehicle()
             {
-                VechicleRegistration = Guid.NewGuid(),
-                Brand = "FORD",
-                Model = "FOCUS",
+                Brand = "BMW",
+                Model = "320D",
                 Colour = "Black"
             };
 
-            var result= await dbRepo.Create<Vehicle>(vehicle);
-           
-            
-            //var resultMem_Get = await dbRepo.Get<Vehicle>(resultMem_Create.VechicleRegistration);
-            var resultSer_Get = vehicleService.GetVehicle(result.VechicleRegistration);
+            var result = await dbRepo.Create<Vehicle>(vehicle);
+            var resultDelete = await vehicleService.DeleteVehicle(result.Id);
 
-            Assert.AreEqual(result.VechicleRegistration, resultSer_Get.VechicleRegistration);
+            Assert.IsTrue(resultDelete);
+        }
+
+
+        [TestMethod]
+        public async Task VehicleService_GetVehicleTest()
+        {
+            IDatabaseRepo dbRepo = container.Resolve<IDatabaseRepo>();
+            var vehicle = new Vehicle()
+            {
+                Brand = "BMW",
+                Model = "320D",
+                Colour = "Black"
+            };
+
+            var result = await dbRepo.Create<Vehicle>(vehicle);
+            var resultGet = await vehicleService.GetVehicle(result.Id);
+
+            Assert.AreEqual(resultGet.Id, result.Id);
+            await vehicleService.DeleteVehicle(result.Id);
         }
 
         [TestMethod]
-        [Ignore]
-        public void VehicleService_GetVehicleByColour()
+        public async Task VehicleService_UpdateVehicleTest()
         {
+            IDatabaseRepo dbRepo = container.Resolve<IDatabaseRepo>();
+            var vehicle = new Vehicle()
+            {
+                Brand = "BMW",
+                Model = "320D",
+                Colour = "Black"
+            };
 
+            //Save object o DB
+            var result = await dbRepo.Create<Vehicle>(vehicle);
+
+            //Edit Model object
+            result.Model = "535I";
+
+            //Update the object on DB
+            var resultUpdate = await vehicleService.UpdateVehicle(result.Id,result);
+
+            Assert.AreEqual(resultUpdate.Model, result.Model);
+            await vehicleService.DeleteVehicle(resultUpdate.Id);
         }
+
+        [TestMethod]
+        public async Task VehicleService_GetVehiclesTest()
+        {
+            IDatabaseRepo dbRepo = container.Resolve<IDatabaseRepo>();
+            List<Vehicle> vehiclesList = new List<Vehicle>()
+            {
+                new Vehicle()
+                {
+                  Brand = "BMW",
+                  Model = "320D",
+                  Colour = "Black"
+                },
+                new Vehicle()
+                {
+                  Brand = "BMW",
+                  Model = "320D",
+                  Colour = "White"
+                },
+                new Vehicle()
+                {
+                  Brand = "AUDI",
+                  Model = "A5",
+                  Colour = "Black"
+                }
+            };
+
+            var result1 = await dbRepo.Create<Vehicle>(vehiclesList[0]);
+            var result2 = await dbRepo.Create<Vehicle>(vehiclesList[1]);
+            var result3 = await dbRepo.Create<Vehicle>(vehiclesList[2]);
+            var resultGet = await vehicleService.GetVehicles();
+
+            Assert.AreEqual(resultGet.ToList().Count, 3);
+        }
+
+       
+
     }
 }

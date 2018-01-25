@@ -2,13 +2,17 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace LearningTesting.IServices
 {
     public interface IVehicleService
     {
-        Vehicle GetVehicle(Guid vehicleRegistration);
-        IEnumerable<Vehicle> GetVehicleByColour(string colour);
-        Vehicle AddVehicle(Vehicle v);
+        Task<Vehicle> GetVehicle(Guid id);
+        Task<IEnumerable<Vehicle>> GetVehicles();
+        Task<Vehicle> AddVehicle(Vehicle v);
+        Task<bool> DeleteVehicle(Guid id);
+        Task<Vehicle> UpdateVehicle(Guid Id, Vehicle v);
+        Task<int> DeleteAll();
     }
 }

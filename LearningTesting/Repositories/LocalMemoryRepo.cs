@@ -86,7 +86,7 @@ namespace LearningTesting.Repositories
 
         Task<int> IDatabaseRepo.DeleteAll<T>()
         {
-            return Task.FromResult(list.RemoveAll(n => n.Class == typeof(T).Name));
+            return Task.FromResult(list.RemoveAll(n => n.Class.Equals(typeof(T).Name)));
         }
 
         Task<T> IDatabaseRepo.Get<T>(Guid Id)
